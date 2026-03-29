@@ -1,7 +1,10 @@
-import edu.hei.school.ingredient.datasource.DataSource;
-import edu.hei.school.ingredient.entity.*;
+package com.example.ingredient.repository;
+
+
+import com.example.ingredient.entity.*;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

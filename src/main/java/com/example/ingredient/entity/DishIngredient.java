@@ -1,4 +1,5 @@
-package entity;
+package com.example.ingredient.entity;
+import com.example.ingredient.entity.*;
 
 public class DishIngredient {
     private Ingredient ingredient;

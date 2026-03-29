@@ -1,4 +1,4 @@
-package entity;
+package com.example.ingredient.entity;
 
 public class Ingredient {
     private Integer id;

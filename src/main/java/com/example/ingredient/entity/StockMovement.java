@@ -1,5 +1,6 @@
-package entity;
+package com.example.ingredient.entity;
 import java.time.Instant;
+import com.example.ingredient.entity.*;
 
 public class StockMovement {
     private Integer id;

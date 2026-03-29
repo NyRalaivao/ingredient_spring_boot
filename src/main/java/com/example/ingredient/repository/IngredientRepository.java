@@ -1,12 +1,12 @@
-package repository;
+package com.example.ingredient.repository;
 
-import datasource.DataSource;
-import entity.CategoryEnum;
-import entity.Ingredient;
-import entity.StockValue;
-import entity.Unit;
+import com.example.ingredient.entity.CategoryEnum;
+import com.example.ingredient.entity.Ingredient;
+import com.example.ingredient.entity.StockValue;
+import com.example.ingredient.entity.Unit;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -36,15 +36,14 @@ public class IngredientRepository {
         }
     }
 
-    public void findById(Integer id) {
+    public Ingredient findById(Integer id) {
         String sql = "SELECT id, name, price, category FROM ingredient WHERE id = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    mapRow(rs);
-                    return;
+                    return mapRow(rs);
                 }
             }
             throw new RuntimeException("Ingredient.id=" + id + " is not found");

@@ -1,6 +1,7 @@
-package entity;
+package com.example.ingredient.entity;
 
 import java.util.List;
+import com.example.ingredient.entity.*;
 
 public class Dish {
     private Integer id;
