@@ -60,7 +60,7 @@ public class DishRepository {
     }
 
     public Dish updateIngredients(Integer dishId, List<Ingredient> ingredients) {
-        findById(dishId); // vérifie que le plat existe, sinon lance une exception
+        findById(dishId);
         try (Connection conn = dataSource.getConnection()) {
             conn.setAutoCommit(false);
             detachIngredients(conn, dishId);
@@ -91,8 +91,8 @@ public class DishRepository {
             for (Ingredient ingredient : ingredients) {
                 ps.setInt(1, ingredient.getId());
                 ps.setInt(2, dishId);
-                ps.setNull(3, Types.DOUBLE); // quantité non fournie dans ce endpoint
-                ps.setString(4, Unit.KG.name()); // unité par défaut
+                ps.setNull(3, Types.DOUBLE);
+                ps.setString(4, Unit.KG.name());
                 ps.addBatch();
             }
             ps.executeBatch();
