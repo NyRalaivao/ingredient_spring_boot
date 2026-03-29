@@ -6,7 +6,7 @@ import com.example.ingredient.entity.StockValue;
 import com.example.ingredient.entity.Unit;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
+import com.example.ingredient.datasource.DataSource;
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;

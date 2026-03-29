@@ -1,9 +1,11 @@
 package com.example.ingredient.datasource;
 
+import org.springframework.stereotype.Component;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+@Component
 public class DataSource {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/mini_dish_db";
