@@ -142,4 +142,64 @@ public class DishRepository {
                 ? null : rs.getDouble("selling_price"));
         return dish;
     }
+
+    public List<DishIngredient> findIngredientsByDishIdWithFilters(
+            Integer dishId,
+            String ingredientName,
+            Double ingredientPriceAround) {
+
+        findById(dishId);
+
+        List<DishIngredient> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("""
+            SELECT i.id, i.name, i.price, i.category,
+                   di.required_quantity, di.unit
+            FROM ingredient i
+            JOIN dish_ingredient di ON di.id_ingredient = i.id
+            WHERE di.id_dish = ?
+            """);
+
+        List<Object> params = new ArrayList<>();
+        params.add(dishId);
+
+        if (ingredientName != null) {
+            sql.append(" AND i.name ILIKE ?");
+            params.add("%" + ingredientName + "%");
+        }
+
+        if (ingredientPriceAround != null) {
+            sql.append(" AND i.price BETWEEN ? AND ?");
+            params.add(ingredientPriceAround - 50);
+            params.add(ingredientPriceAround + 50);
+        }
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Ingredient ingredient = new Ingredient();
+                    ingredient.setId(rs.getInt("id"));
+                    ingredient.setName(rs.getString("name"));
+                    ingredient.setPrice(rs.getDouble("price"));
+                    ingredient.setCategory(CategoryEnum.valueOf(rs.getString("category")));
+
+                    DishIngredient di = new DishIngredient();
+                    di.setIngredient(ingredient);
+                    di.setQuantity(rs.getObject("required_quantity") == null
+                            ? null : rs.getDouble("required_quantity"));
+                    di.setUnit(Unit.valueOf(rs.getString("unit")));
+                    list.add(di);
+                }
+            }
+            return list;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
