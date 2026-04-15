@@ -1,0 +1,202 @@
+openapi: 3.0.3
+
+info:
+  title: Ingredient Management API
+  description: >
+    API REST de gestion des ingrédients développée avec Spring Boot.
+    Permet de consulter les informations d'un ingrédient ainsi que la valeur
+    de son stock à un instant donné.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Serveur de développement local
+
+paths:
+
+  /ingredients/{id}:
+    get:
+      summary: Récupérer un ingrédient par son identifiant
+      description: >
+        Retourne un objet JSON relatif à l'ingrédient portant l'identifiant
+        fourni à travers {id} et contenant les attributs : identifiant, nom,
+        catégorie de l'ingrédient et prix.
+        Dans le cas où l'ingrédient n'est pas trouvé, retourne une réponse HTTP
+        contenant le code de statut 404 et un message textuel.
+      operationId: getIngredientById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant unique de l'ingrédient
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ingrédient trouvé avec succès
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+              example:
+                id: 1
+                name: "Tomate"
+                category: "VEGETABLE"
+                price: 2.5
+        "404":
+          description: Ingrédient non trouvé
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: "Ingredient.id=1 is not found"
+
+  /ingredients/{id}/stock:
+    get:
+      summary: Récupérer la valeur du stock d'un ingrédient à un instant donné
+      description: >
+        Retourne un objet JSON relatif à la valeur de stock de l'ingrédient
+        portant l'identifiant fourni à travers {id} et contenant les attributs :
+        unité (PCS, KG, L) et la valeur du stock de type nombre.
+        Les paramètres de requêtes at et unit doivent être obligatoires afin de
+        déterminer à quel moment voulons récupérer la valeur du stock de l'ingrédient.
+        Dans le cas où l'ingrédient n'est pas trouvé, retourne une réponse HTTP
+        contenant le code de statut 404 et un message textuel.
+        Dans le cas où l'un des paramètres at ou unit n'est pas fourni, retourne
+        une réponse HTTP contenant le code de statut 400 et un message textuel.
+      operationId: getIngredientStock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant unique de l'ingrédient
+          schema:
+            type: integer
+        - name: at
+          in: query
+          required: true
+          description: >
+            Instant temporel auquel récupérer la valeur du stock,
+            au format ISO-8601 (ex : 2024-01-15T10:30:00Z)
+          schema:
+            type: string
+            format: date-time
+          example: "2024-01-15T10:30:00Z"
+        - name: unit
+          in: query
+          required: true
+          description: Unité de mesure du stock (PCS, KG ou L)
+          schema:
+            type: string
+            enum:
+              - PCS
+              - KG
+              - L
+          example: "KG"
+      responses:
+        "200":
+          description: Valeur du stock récupérée avec succès
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockValue"
+              example:
+                unit: "KG"
+                quantity: 15.5
+        "400":
+          description: >
+            L'un des paramètres obligatoires at ou unit n'est pas fourni
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: "Either mandatory query parameter `at` or `unit` is not provided."
+        "404":
+          description: Ingrédient non trouvé
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: "Ingredient.id=1 is not found"
+
+components:
+  schemas:
+
+    Ingredient:
+      type: object
+      description: Représente un ingrédient avec ses informations de base
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique de l'ingrédient
+          example: 1
+        name:
+          type: string
+          description: Nom de l'ingrédient
+          example: "Tomate"
+        category:
+          type: string
+          description: Catégorie de l'ingrédient
+          enum:
+            - VEGETABLE
+            - ANIMAL
+            - MARINE
+            - DAIRY
+            - OTHER
+          example: "VEGETABLE"
+        price:
+          type: number
+          format: double
+          description: Prix unitaire de l'ingrédient
+          example: 2.5
+      required:
+        - id
+        - name
+        - category
+        - price
+
+    StockValue:
+      type: object
+      description: Représente la valeur de stock d'un ingrédient à un instant donné
+      properties:
+        unit:
+          type: string
+          description: Unité de mesure du stock
+          enum:
+            - PCS
+            - KG
+            - L
+          example: "KG"
+        quantity:
+          type: number
+          format: double
+          description: Valeur numérique du stock dans l'unité indiquée
+          example: 15.5
+      required:
+        - unit
+        - quantity
